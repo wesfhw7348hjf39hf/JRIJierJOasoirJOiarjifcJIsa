@@ -226,7 +226,7 @@ if typeof(copyfunction) == "function" then -- fix for shitsploits
 end
 
 local SaveManager = {} do
-	SaveManager.Folder = 'xiao hack software'
+	SaveManager.Folder = 'software'
 	SaveManager.Ignore = {}
 	SaveManager.Parser = {
 		Toggle = {
@@ -234,8 +234,8 @@ local SaveManager = {} do
 				return { type = 'Toggle', idx = idx, value = object.Value } 
 			end,
 			Load = function(idx, data)
-				if getgenv().XiaoHack.Toggles[idx] then 
-					getgenv().XiaoHack.Toggles[idx]:SetValue(data.value)
+				if getgenv().UI.Toggles[idx] then 
+					getgenv().UI.Toggles[idx]:SetValue(data.value)
 				end
 			end,
 		},
@@ -244,8 +244,8 @@ local SaveManager = {} do
 				return { type = 'Slider', idx = idx, value = tostring(object.Value) }
 			end,
 			Load = function(idx, data)
-				if getgenv().XiaoHack.Options[idx] then 
-					getgenv().XiaoHack.Options[idx]:SetValue(data.value)
+				if getgenv().UI.Options[idx] then 
+					getgenv().UI.Options[idx]:SetValue(data.value)
 				end
 			end,
 		},
@@ -254,8 +254,8 @@ local SaveManager = {} do
 				return { type = 'Dropdown', idx = idx, value = object.Value, mutli = object.Multi }
 			end,
 			Load = function(idx, data)
-				if getgenv().XiaoHack.Options[idx] then 
-					getgenv().XiaoHack.Options[idx]:SetValue(data.value)
+				if getgenv().UI.Options[idx] then 
+					getgenv().UI.Options[idx]:SetValue(data.value)
 				end
 			end,
 		},
@@ -264,8 +264,8 @@ local SaveManager = {} do
 				return { type = 'ColorPicker', idx = idx, value = object.Value:ToHex(), transparency = object.Transparency }
 			end,
 			Load = function(idx, data)
-				if getgenv().XiaoHack.Options[idx] then 
-					getgenv().XiaoHack.Options[idx]:SetValueRGB(Color3.fromHex(data.value), data.transparency)
+				if getgenv().UI.Options[idx] then 
+					getgenv().UI.Options[idx]:SetValueRGB(Color3.fromHex(data.value), data.transparency)
 				end
 			end,
 		},
@@ -274,8 +274,8 @@ local SaveManager = {} do
 				return { type = 'KeyPicker', idx = idx, mode = object.Mode, key = object.Value }
 			end,
 			Load = function(idx, data)
-				if getgenv().XiaoHack.Options[idx] then 
-					getgenv().XiaoHack.Options[idx]:SetValue({ data.key, data.mode })
+				if getgenv().UI.Options[idx] then 
+					getgenv().UI.Options[idx]:SetValue({ data.key, data.mode })
 				end
 			end,
 		},
@@ -285,8 +285,8 @@ local SaveManager = {} do
 				return { type = 'Input', idx = idx, text = object.Value }
 			end,
 			Load = function(idx, data)
-				if getgenv().XiaoHack.Options[idx] and type(data.text) == 'string' then
-					getgenv().XiaoHack.Options[idx]:SetValue(data.text)
+				if getgenv().UI.Options[idx] and type(data.text) == 'string' then
+					getgenv().UI.Options[idx]:SetValue(data.text)
 				end
 			end,
 		},
@@ -336,13 +336,13 @@ local SaveManager = {} do
 			objects = {}
 		}
 
-		for idx, toggle in next, getgenv().XiaoHack.Toggles do
+		for idx, toggle in next, getgenv().UI.Toggles do
 			if self.Ignore[idx] then continue end
 
 			table.insert(data.objects, self.Parser[toggle.Type].Save(idx, toggle))
 		end
 
-		for idx, option in next, getgenv().XiaoHack.Options do
+		for idx, option in next, getgenv().UI.Options do
 			if not self.Parser[option.Type] then continue end
 			if self.Ignore[idx] then continue end
 
@@ -463,7 +463,7 @@ local SaveManager = {} do
 
 		section:AddInput('SaveManager_ConfigName',    { Text = 'Config name' })
 		section:AddButton('Create config', function()
-			local name = getgenv().XiaoHack.Options.SaveManager_ConfigName.Value
+			local name = getgenv().UI.Options.SaveManager_ConfigName.Value
 
 			if name:gsub(' ', '') == '' then 
 				return self.Library:Notify('Invalid config name (empty)', 2)
@@ -476,15 +476,15 @@ local SaveManager = {} do
 
 			self.Library:Notify(string.format('Created config %q', name))
 
-			getgenv().XiaoHack.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
-			getgenv().XiaoHack.Options.SaveManager_ConfigList:SetValue(nil)
+			getgenv().UI.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+			getgenv().UI.Options.SaveManager_ConfigList:SetValue(nil)
 		end)
 
 		section:AddDivider()
 
 		section:AddDropdown('SaveManager_ConfigList', { Text = 'Config list', Values = self:RefreshConfigList(), AllowNull = true })
 		section:AddButton('Load Config', function()
-			local name = getgenv().XiaoHack.Options.SaveManager_ConfigList.Value
+			local name = getgenv().UI.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Load(name)
 			if not success then
@@ -494,7 +494,7 @@ local SaveManager = {} do
 			self.Library:Notify(string.format('Loaded config %q', name))
 		end)
 		section:AddButton('Overwrite Config', function()
-			local name = getgenv().XiaoHack.Options.SaveManager_ConfigList.Value
+			local name = getgenv().UI.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Save(name)
 			if not success then
@@ -503,7 +503,7 @@ local SaveManager = {} do
 
 			self.Library:Notify(string.format('Overwrote config %q', name))
 		end):AddButton('Delete Config', function()
-			local name = getgenv().XiaoHack.Options.SaveManager_ConfigList.Value
+			local name = getgenv().UI.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Delete(name)
 			if not success then
@@ -511,12 +511,12 @@ local SaveManager = {} do
 			end
 
 			self.Library:Notify(string.format('Deleted config %q', name))
-			getgenv().XiaoHack.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
-			getgenv().XiaoHack.Options.SaveManager_ConfigList:SetValue(nil)
+			getgenv().UI.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+			getgenv().UI.Options.SaveManager_ConfigList:SetValue(nil)
 		end)
 
 		section:AddButton('Set Autoload', function()
-			local name = getgenv().XiaoHack.Options.SaveManager_ConfigList.Value
+			local name = getgenv().UI.Options.SaveManager_ConfigList.Value
 			writefile(self.Folder .. '/configs/autoload.txt', name)
 			SaveManager.AutoloadLabel:SetText('Current Auto Config: ' .. name)
 			self.Library:Notify(string.format('Set %q to auto load', name))
@@ -531,8 +531,8 @@ local SaveManager = {} do
 		end)
 
 		section:AddButton('Refresh', function()
-			getgenv().XiaoHack.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
-			getgenv().XiaoHack.Options.SaveManager_ConfigList:SetValue(nil)
+			getgenv().UI.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+			getgenv().UI.Options.SaveManager_ConfigList:SetValue(nil)
 		end)
 
 		SaveManager.AutoloadLabel = section:AddLabel('Current Auto Config: None', true)
